@@ -1,0 +1,14 @@
+%html
+	%head
+		%script{:type => "text/javascript", :src => "burn.js"}
+		%link{:rel => "stylesheet", :type => "text/css", :href => "burn.css"}
+	%body
+		.title
+			%img{:src => "img/virtualburn_text.gif"}
+		.content
+			%canvas{:id => :burn, :width => 414, :height => 400}
+		.hidden
+			%img{:src => "img/virtualburn_fire.gif", :id => 'fire'}
+			%img{:src => "img/virtualburn_holybible_static.gif", :id => 'bible_static'}
+			%img{:src => "img/virtualburn_quran_static.gif", :id => 'quran_static'}
+			%img{:src => "img/virtualburn_torah_static.gif", :id => 'torah_static'}
