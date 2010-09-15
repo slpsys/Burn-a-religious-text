@@ -40,14 +40,17 @@ Book.prototype.move = function(x, y) {
 	this.x = x;
 	this.y = y;
 }
-Book.prototype.moveRelative = function(x, y) {
-	this.x += x;
-	this.y += y;
+Book.prototype.checkForBurn = function(discrim) {
+	var bounds = this.getBoundingRect();
+	if (bounds[3] < discrim) {
+		alert("Burned!");
+	}
 }
 
 var BookCollection = function(canvas) {
 	this.canvas = canvas;
 	this.bgObjects = new Array();
+	this.discrim = 0;
 }
 BookCollection.prototype = new Array;
 BookCollection.prototype.add = function(book) { this.push(book); }
@@ -75,6 +78,7 @@ BookCollection.prototype.moveStarted = function(e) {
 	}
 }
 BookCollection.prototype.moveStopped = function(e) {
+	this.bookMoving.checkForBurn(this.discrim);
 	this.canvas.onmousemove = null;
 }
 BookCollection.prototype.moving = function(e) {
@@ -122,6 +126,7 @@ window.onload = function() {
 	books.add(new Book(20 + books[1].getBoundingRect()[2], canvas.height - img.height, img, "torah"));
 	
 	books.registerBgObject(new BackgroundObject(0, 0, imgFire));
+	books.discrim = imgFire.height;
 	loop(function() {books.drawAll.apply(books) }, 25);
 	books.drawAll();	
 	
