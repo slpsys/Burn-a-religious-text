@@ -33,9 +33,16 @@ Book.prototype.isInRect = function(canvas, e) {
 		ret = true;
 	return ret;
 }
+Book.prototype.getRelative = function(x, y) {
+	return [x - this.x, y - this.y];
+}
 Book.prototype.move = function(x, y) {
 	this.x = x;
 	this.y = y;
+}
+Book.prototype.moveRelative = function(x, y) {
+	this.x += x;
+	this.y += y;
 }
 
 var BookCollection = function(canvas) {
@@ -61,7 +68,9 @@ BookCollection.prototype.moveStarted = function(e) {
 	var self = this;
 	var bookMoving = this.getBookByClick(e);
 	if (bookMoving) {
+		var coords = getRelative(this.canvas, e);
 		this.bookMoving = bookMoving;
+		this.bookOffset = this.bookMoving.getRelative(coords.x, coords.y);
 		this.canvas.onmousemove = function() { self.moving.apply(self, arguments); }	
 	}
 }
@@ -71,8 +80,9 @@ BookCollection.prototype.moveStopped = function(e) {
 BookCollection.prototype.moving = function(e) {
 	var item = document.getElementById('console');
 	coords = getRelative(this.canvas, e);
-	item.innerHTML = coords.x + ', ' + coords.y + ' ';
-	this.bookMoving.move(coords.x, coords.y);
+	
+	item.innerHTML = (coords.x - this.bookOffset[0]) + "," + (coords.y - this.bookOffset[1]);
+	this.bookMoving.move(coords.x - this.bookOffset[0], coords.y - this.bookOffset[1]);
 	this.drawAll();
 }
 BookCollection.prototype.drawAll = function() {
