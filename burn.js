@@ -63,10 +63,11 @@ var BackgroundObject = function(x, y, img) {
 	this.image = img;
 }
 
-var Book = function(x, y, img, name) {
+var Book = function(x, y, img, burning, name) {
 	this.x = x;
 	this.y = y;
 	this.image = img;
+	this.burning = burning;
 	this.name = name;
 }
 Book.prototype.getBoundingRect = function() {
@@ -96,7 +97,10 @@ Book.prototype.move = function(x, y) {
 Book.prototype.checkForBurn = function(discrim) {
 	var bounds = this.getBoundingRect();
 	if (bounds[3] < discrim) {
-		alert("Burned!");
+		var img = this.burning;
+		this.burning = this.image;
+		this.image = img;
+		this.image.style.visbility = "visible";
 	}
 }
 
@@ -137,8 +141,6 @@ BookCollection.prototype.moveStopped = function(e) {
 BookCollection.prototype.moving = function(e) {
 	var item = document.getElementById('console');
 	coords = new RelativeCoords(this.canvas, e);
-	
-	item.innerHTML = (coords.x - this.bookOffset[0]) + "," + (coords.y - this.bookOffset[1]);
 	this.bookMoving.move(coords.x - this.bookOffset[0], coords.y - this.bookOffset[1]);
 	this.drawAll();
 }
