@@ -1,49 +1,79 @@
+function getRelative(canvas, e) {
+	this.x = e.clientX - canvas.offsetLeft;
+	this.y = e.clientY - canvas.offsetTop;
+	return this;
+}
+
 var Book = function(x, y, img, name) {
 	this.x = x;
 	this.y = y;
 	this.image = img;
 	this.name = name;
 }
-
 Book.prototype.getBoundingRect = function() {
 		return [this.x, this.y, this.x + this.image.width, this.y + this.image.height];
 	};
-
 Book.prototype.draw = function(canvas) {
 		if (canvas.getContext) {
 			var ctx = canvas.getContext('2d');			
 			ctx.drawImage(this.image, this.x, this.y);
 		}
 	};
-
 Book.prototype.isInRect = function(canvas, e) {
-	var x = e.clientX - canvas.offsetLeft;
-	var y = e.clientY - canvas.offsetTop;
+	var coords = getRelative(canvas, e);
 	var rect = this.getBoundingRect();
 	var ret = false;
-	if (x >= rect[0] && x <= rect[2] & y >= rect[1] && y <= rect[3])
+	if (coords.x >= rect[0] && coords.x <= rect[2] & coords.y >= rect[1] && coords.y <= rect[3])
 		ret = true;
 	return ret;
 }
-
-var BookCollection = function() {
+Book.prototype.move = function(x, y) {
+	this.x = x;
+	this.y = y;
 }
 
+var BookCollection = function(canvas) {
+	this.canvas = canvas;
+	this.bgObjects = new Array();
+}
 BookCollection.prototype = new Array;
 BookCollection.prototype.add = function(book) { this.push(book); }
-BookCollection.prototype.getBookByClick = function(canvas, e) {
+BookCollection.prototype.getBookByClick = function(e) {
 	var ret;
 	for (var i in this) {
-		if (this[i].isInRect && this[i].isInRect(canvas, e)) {
+		if (this[i].isInRect && this[i].isInRect(this.canvas, e)) {
 			ret = this[i];
 		}
 	}
 	return ret;
 }
-BookCollection.prototype.drawAll = function(canvas) {
+BookCollection.prototype.registerBgObject = function(img) {
+	if (img)
+		this.bgObjects.push(img);
+}
+BookCollection.prototype.moveStarted = function(e) {
+	var self = this;
+	var bookMoving = this.getBookByClick(e);
+	if (bookMoving) {
+		this.bookMoving = bookMoving;
+		this.canvas.onmousemove = function() { self.moving.apply(self, arguments); }	
+	}
+}
+BookCollection.prototype.moveStopped = function(e) {
+	this.canvas.onmousemove = null;
+	this.bookMoving = null;
+}
+BookCollection.prototype.moving = function(e) {
+	var item = document.getElementById('console');
+	coords = getRelative(this.canvas, e);
+	item.innerHTML = coords.x + ', ' + coords.y + ' ';
+	this.bookMoving.move(coords.x, coords.y);
+	this.drawAll();
+}
+BookCollection.prototype.drawAll = function() {
 	for (var i in this) { 
 		if (this[i].draw)
-			this[i].draw(canvas); 
+			this[i].draw(this.canvas); 
 	}
 }
 
@@ -72,18 +102,18 @@ window.onload = function() {
 	loop(function() {drawAniGif('fire', canvas, 0, 0)}, 25);
 	
 	var img = document.getElementById('bible_static');
-	var books = new BookCollection();
+	var books = new BookCollection(canvas);
 	books.add(new Book(20, canvas.height - img.height, img, "bible"));
 	img = document.getElementById('quran_static');
 	books.add(new Book(20 + books[0].getBoundingRect()[2], canvas.height - img.height, img, "quran"));
 	img = document.getElementById('torah_static');
 	books.add(new Book(20 + books[1].getBoundingRect()[2], canvas.height - img.height, img, "torah"));
-	books.drawAll(canvas);	
+	books.drawAll();	
 	
-	canvas.onclick = function(e) {
-		var book = books.getBookByClick(canvas, e);
-		if (book) {
-			alert("Is in " + book.name);
-		}
+	canvas.onmousedown = function(e) {
+		books.moveStarted(e);
+	}
+	canvas.onmouseup = function(e) {
+		books.moveStopped(e);
 	}
 };

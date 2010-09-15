@@ -5,6 +5,14 @@
 	margin-bottom: 30px;
 	width: 590px;
 }
+#console
+{
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 30px;
+	width: 200px;
+	text-align: center;
+}
 .content 
 {
 	margin-left: auto;
