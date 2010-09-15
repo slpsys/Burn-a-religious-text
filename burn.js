@@ -4,6 +4,12 @@ function getRelative(canvas, e) {
 	return this;
 }
 
+var BackgroundObject = function(x, y, img) {
+	this.x = x;
+	this.y = y;
+	this.image = img;
+}
+
 var Book = function(x, y, img, name) {
 	this.x = x;
 	this.y = y;
@@ -61,7 +67,6 @@ BookCollection.prototype.moveStarted = function(e) {
 }
 BookCollection.prototype.moveStopped = function(e) {
 	this.canvas.onmousemove = null;
-	this.bookMoving = null;
 }
 BookCollection.prototype.moving = function(e) {
 	var item = document.getElementById('console');
@@ -71,9 +76,18 @@ BookCollection.prototype.moving = function(e) {
 	this.drawAll();
 }
 BookCollection.prototype.drawAll = function() {
-	for (var i in this) { 
-		if (this[i].draw)
+	if (this.canvas.getContext)
+	{
+		var ctx = this.canvas.getContext('2d');
+		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		
+		for (var i in this.bgObjects) {
+			ctx.drawImage(this.bgObjects[i].image,this.bgObjects[i].x, this.bgObjects[i].y);
+		}
+		for (var i in this) { 
+			if (this[i].draw)
 			this[i].draw(this.canvas); 
+		}
 	}
 }
 
@@ -86,20 +100,8 @@ window.onload = function() {
 		}
 	}
 	
-	drawAniGif = function(id, canvas, x, y) 
-	{
-		if (id && canvas.getContext) {
-			var ctx = canvas.getContext('2d');
-			var img = document.getElementById(id);
-			
-			ctx.clearRect(x, y, img.width, img.height);
-			ctx.drawImage(img, x,y);
-		}
-	};
-	
-	var canvas = document.getElementById('burn');	
-	// Animate the flames; stupid GIFs do not auto-animate in Canvas
-	loop(function() {drawAniGif('fire', canvas, 0, 0)}, 25);
+	var canvas = document.getElementById('burn');
+	var imgFire = document.getElementById('fire');
 	
 	var img = document.getElementById('bible_static');
 	var books = new BookCollection(canvas);
@@ -108,6 +110,9 @@ window.onload = function() {
 	books.add(new Book(20 + books[0].getBoundingRect()[2], canvas.height - img.height, img, "quran"));
 	img = document.getElementById('torah_static');
 	books.add(new Book(20 + books[1].getBoundingRect()[2], canvas.height - img.height, img, "torah"));
+	
+	books.registerBgObject(new BackgroundObject(0, 0, imgFire));
+	loop(function() {books.drawAll.apply(books) }, 25);
 	books.drawAll();	
 	
 	canvas.onmousedown = function(e) {
