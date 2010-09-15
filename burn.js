@@ -1,6 +1,59 @@
-function getRelative(canvas, e) {
+function buildScene() {
+	var canvas = document.getElementById('burn');
+	var imgFire = document.getElementById('fire');
+	var books = buildLibrary(canvas, ['bible', 'quran', 'torah'], 25);
+	books.registerBgObject(new BackgroundObject(0, 0, imgFire));
+	books.discrim = imgFire.height;
+	
+	// Start animation loop
+	loop(function() {books.drawAll.apply(books) }, 25);
+	books.drawAll();	
+	
+	// Register drawing events
+	canvas.onmousedown = function(e) {
+		books.moveStarted(e);
+	}
+	canvas.onmouseup = function(e) {
+		books.moveStopped(e);
+	}	
+}
+
+function buildLibrary(canvas, names, margin) {
+	var books = new BookCollection(canvas);
+	var lastBook;
+	
+	for (var name in names) {
+		imageSet = new ImageSet(names[name]);
+		var book;
+		if (lastBook)
+			book = new Book(margin + lastBook.getBoundingRect()[2], canvas.height - imageSet.normal.height, 
+				imageSet.normal, imageSet.burning, imageSet.name);
+		else
+			book = new Book(margin, canvas.height - imageSet.normal.height, imageSet.normal, imageSet.burning, 
+				imageSet.name);
+		books.add(book);
+		lastBook = book;
+	}
+	return books;
+}
+
+function loop(action, interval) {
+	if (action && interval > 0) {
+		action();
+		setInterval(action, interval);
+	}
+}
+
+var RelativeCoords = function(canvas, e) {
 	this.x = e.clientX - canvas.offsetLeft;
 	this.y = e.clientY - canvas.offsetTop;
+	return this;
+}
+
+var ImageSet = function(name) {
+	this.normal = document.getElementById(name + '_static');
+	this.burning = document.getElementById(name + '_burning');
+	this.name = name;
 	return this;
 }
 
@@ -26,7 +79,7 @@ Book.prototype.draw = function(canvas) {
 		}
 	};
 Book.prototype.isInRect = function(canvas, e) {
-	var coords = getRelative(canvas, e);
+	var coords = new RelativeCoords(canvas, e);
 	var rect = this.getBoundingRect();
 	var ret = false;
 	if (coords.x >= rect[0] && coords.x <= rect[2] & coords.y >= rect[1] && coords.y <= rect[3])
@@ -71,7 +124,7 @@ BookCollection.prototype.moveStarted = function(e) {
 	var self = this;
 	var bookMoving = this.getBookByClick(e);
 	if (bookMoving) {
-		var coords = getRelative(this.canvas, e);
+		var coords = new RelativeCoords(this.canvas, e);
 		this.bookMoving = bookMoving;
 		this.bookOffset = this.bookMoving.getRelative(coords.x, coords.y);
 		this.canvas.onmousemove = function() { self.moving.apply(self, arguments); }	
@@ -83,7 +136,7 @@ BookCollection.prototype.moveStopped = function(e) {
 }
 BookCollection.prototype.moving = function(e) {
 	var item = document.getElementById('console');
-	coords = getRelative(this.canvas, e);
+	coords = new RelativeCoords(this.canvas, e);
 	
 	item.innerHTML = (coords.x - this.bookOffset[0]) + "," + (coords.y - this.bookOffset[1]);
 	this.bookMoving.move(coords.x - this.bookOffset[0], coords.y - this.bookOffset[1]);
@@ -106,34 +159,5 @@ BookCollection.prototype.drawAll = function() {
 }
 
 window.onload = function() {
-	loop = function(action, interval)
-	{
-		if (action && interval > 0) {
-			action();
-			setInterval(action, interval);
-		}
-	}
-	
-	var canvas = document.getElementById('burn');
-	var imgFire = document.getElementById('fire');
-	
-	var img = document.getElementById('bible_static');
-	var books = new BookCollection(canvas);
-	books.add(new Book(20, canvas.height - img.height, img, "bible"));
-	img = document.getElementById('quran_static');
-	books.add(new Book(20 + books[0].getBoundingRect()[2], canvas.height - img.height, img, "quran"));
-	img = document.getElementById('torah_static');
-	books.add(new Book(20 + books[1].getBoundingRect()[2], canvas.height - img.height, img, "torah"));
-	
-	books.registerBgObject(new BackgroundObject(0, 0, imgFire));
-	books.discrim = imgFire.height;
-	loop(function() {books.drawAll.apply(books) }, 25);
-	books.drawAll();	
-	
-	canvas.onmousedown = function(e) {
-		books.moveStarted(e);
-	}
-	canvas.onmouseup = function(e) {
-		books.moveStopped(e);
-	}
+	buildScene();
 };
