@@ -51,7 +51,8 @@ var RelativeCoords = function(canvas, e) {
 }
 
 var ImageSet = function(name) {
-	this.normal = document.getElementById(name + '_static');
+	this.normal = document.getElementById(name);
+	this.normal.src = 'img/virtualburn_' + name + '_static.gif';
 	this.burning = document.getElementById(name + '_burning');
 	this.name = name;
 	return this;
@@ -96,12 +97,12 @@ Book.prototype.move = function(x, y) {
 }
 Book.prototype.checkForBurn = function(discrim) {
 	var bounds = this.getBoundingRect();
+	var ret = false;
 	if (bounds[3] < discrim) {
-		var img = this.burning;
-		this.burning = this.image;
-		this.image = img;
-		this.image.style.visbility = "visible";
+		this.image.src = this.image.src.replace("_static", "_burn");
+		ret = true;
 	}
+	return ret;
 }
 
 var BookCollection = function(canvas) {
@@ -135,8 +136,12 @@ BookCollection.prototype.moveStarted = function(e) {
 	}
 }
 BookCollection.prototype.moveStopped = function(e) {
-	this.bookMoving.checkForBurn(this.discrim);
 	this.canvas.onmousemove = null;
+	this.drawAll();
+	if (this.bookMoving && this.bookMoving.checkForBurn(this.discrim)) {
+		var self = this;
+		setTimeout(function() { self.removeByName.apply(self, [self.bookMoving.name]) }, 4000);
+	}
 }
 BookCollection.prototype.moving = function(e) {
 	var item = document.getElementById('console');
@@ -155,9 +160,20 @@ BookCollection.prototype.drawAll = function() {
 		}
 		for (var i in this) { 
 			if (this[i].draw)
-			this[i].draw(this.canvas); 
+				this[i].draw(this.canvas); 
 		}
 	}
+}
+BookCollection.prototype.removeByName = function(name) {
+	var remove;
+	for (var i in this) {
+		if (this[i] && this[i].name === name) {
+			remove = i;
+			break;
+		}
+	}
+	if (remove)
+		this.splice(remove, 1);
 }
 
 window.onload = function() {
