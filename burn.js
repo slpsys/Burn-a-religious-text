@@ -1,7 +1,7 @@
 function buildScene() {
 	var canvas = document.getElementById('burn');
 	var imgFire = document.getElementById('fire');
-	var books = buildLibrary(canvas, ['bible', 'quran', 'torah', 'mormon', 'vedas'], 25);
+	var books = buildLibrary(canvas, ['bible', 'quran', 'torah'], 25);
 	books.registerBgObject(new BackgroundObject(0, 0, imgFire));
 	books.discrim = imgFire.height;
 	
