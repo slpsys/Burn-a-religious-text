@@ -52,7 +52,7 @@ var RelativeCoords = function(canvas, e) {
 
 var ImageSet = function(name) {
 	this.normal = document.getElementById(name);
-	this.normal.src = 'img/virtualburn_' + name + '_static.gif';
+	this.normal.src = 'img/' + name + '_static.gif';
 	this.burning = document.getElementById(name + '_burning');
 	this.name = name;
 	return this;
