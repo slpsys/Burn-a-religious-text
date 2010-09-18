@@ -40,3 +40,9 @@
 	height: 600px;
 	z-index: -5;
 }
+.ribbon
+{
+	position: absolute;
+	right: 0;
+	top: 0;
+}
