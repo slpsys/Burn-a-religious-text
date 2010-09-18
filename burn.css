@@ -5,14 +5,6 @@
 	margin-bottom: 30px;
 	width: 590px;
 }
-#console
-{
-	margin-left: auto;
-	margin-right: auto;
-	margin-bottom: 30px;
-	width: 200px;
-	text-align: center;
-}
 .content 
 {
 	margin-left: auto;
@@ -45,4 +37,9 @@
 	position: absolute;
 	right: 0;
 	top: 0;
+}
+.fbshare
+{
+	margin-top: 20;
+	text-align: center;
 }

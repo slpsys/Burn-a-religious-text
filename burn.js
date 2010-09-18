@@ -1,7 +1,7 @@
 function buildScene() {
 	var canvas = document.getElementById('burn');
 	var imgFire = document.getElementById('fire');
-	var books = buildLibrary(canvas, ['bible', 'quran', 'torah', 'mormon', 'vedas', 'dianetics'], 25);
+	var books = buildLibrary(canvas, ['bible', 'quran', 'torah', 'mormon', 'vedas', 'dianetics'], 40);
 	books.registerBgObject(new BackgroundObject(0, 0, imgFire));
 	books.discrim = imgFire.height;
 	
@@ -20,19 +20,23 @@ function buildScene() {
 
 function buildLibrary(canvas, names, margin) {
 	var books = new BookCollection(canvas);
-	var lastBook;
+	var lastBook, index = 0, booksPerRow = 3;
 	
 	for (var name in names) {
 		imageSet = new ImageSet(names[name]);
 		var book;
-		if (lastBook)
-			book = new Book(margin + lastBook.getBoundingRect()[2], canvas.height - imageSet.normal.height, 
+		if (lastBook && 0 < index % booksPerRow) {
+			book = new Book(margin + lastBook.getBoundingRect()[2], lastBook.y + (lastBook.image.height - imageSet.normal.height),
 				imageSet.normal, imageSet.burning, imageSet.name);
-		else
-			book = new Book(margin, canvas.height - imageSet.normal.height, imageSet.normal, imageSet.burning, 
+		}
+		else {
+			y = canvas.height - imageSet.normal.height - (index/booksPerRow * (lastBook ? lastBook.image.height + margin: 0));
+			book = new Book(margin, y, imageSet.normal, imageSet.burning, 
 				imageSet.name);
+		}
 		books.add(book);
 		lastBook = book;
+		index++;
 	}
 	return books;
 }

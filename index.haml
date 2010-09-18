@@ -1,13 +1,14 @@
 %html
 	%head
 		%script{:type => "text/javascript", :src => "burn.js"}
+		%script{:type => "text/javascript", :src => "http://static.ak.fbcdn.net/connect.php/js/FB.Share"}
 		%link{:rel => "stylesheet", :type => "text/css", :href => "burn.css"}
 	%body
 		.title
 			%img{:src => "img/text.gif"}
 		.screen
 		.content
-			%canvas{:id => :burn, :width => 414, :height => 400}
+			%canvas{:id => :burn, :width => 414, :height => 550}
 		.noview
 			%img{:src => "img/fire.gif", :id => 'fire'}
 			%img{:src => "img/bible_static.gif", :id => 'bible'}
@@ -19,3 +20,5 @@
 		.ribbon
 			%a{:href => "http://github.com/slpsys/Burn-a-religious-text"}
 				%img{:src => "http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"}
+		.fbshare
+			%a{:name => "fb_share"}
