@@ -136,6 +136,8 @@ BookCollection.prototype.moveStarted = function(e) {
 		var coords = new RelativeCoords(this.canvas, e);
 		this.bookMoving = bookMoving;
 		this.bookOffset = this.bookMoving.getRelative(coords.x, coords.y);
+		this.removeByName(this.bookMoving.name);
+		this.collection.push(this.bookMoving);
 		this.canvas.onmousemove = function() { self.moving.apply(self, arguments); }	
 	}
 }
@@ -176,7 +178,7 @@ BookCollection.prototype.removeByName = function(name) {
 			break;
 		}
 	}
-	if (remove)
+	if (remove) 
 		this.collection.splice(remove, 1);
 }
 
