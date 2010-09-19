@@ -143,8 +143,8 @@ BookCollection.prototype.moveStopped = function(e) {
 	this.canvas.onmousemove = null;
 	this.drawAll();
 	if (this.bookMoving && this.bookMoving.checkForBurn(this.discrim)) {
-		var self = this;
-		setTimeout(function() { self.removeByName.apply(self, [self.bookMoving.name]) }, 1750);
+		var self = this, bookToBurn = this.bookMoving.name;
+		setTimeout(function() { self.removeByName.apply(self, [bookToBurn]) }, 1750);
 	}
 }
 BookCollection.prototype.moving = function(e) {
