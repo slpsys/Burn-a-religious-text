@@ -113,14 +113,14 @@ var BookCollection = function(canvas) {
 	this.canvas = canvas;
 	this.bgObjects = new Array();
 	this.discrim = 0;
+	this.collection = new Array();
 }
-BookCollection.prototype = new Array;
-BookCollection.prototype.add = function(book) { this.push(book); }
+BookCollection.prototype.add = function(book) { this.collection.push(book); }
 BookCollection.prototype.getBookByClick = function(e) {
 	var ret;
-	for (var i in this) {
-		if (this[i].isInRect && this[i].isInRect(this.canvas, e)) {
-			ret = this[i];
+	for (var i in this.collection) {
+		if (this.collection[i].isInRect && this.collection[i].isInRect(this.canvas, e)) {
+			ret = this.collection[i];
 		}
 	}
 	return ret;
@@ -144,7 +144,7 @@ BookCollection.prototype.moveStopped = function(e) {
 	this.drawAll();
 	if (this.bookMoving && this.bookMoving.checkForBurn(this.discrim)) {
 		var self = this;
-		setTimeout(function() { self.removeByName.apply(self, [self.bookMoving.name]) }, 4000);
+		setTimeout(function() { self.removeByName.apply(self, [self.bookMoving.name]) }, 1750);
 	}
 }
 BookCollection.prototype.moving = function(e) {
@@ -162,22 +162,22 @@ BookCollection.prototype.drawAll = function() {
 		for (var i in this.bgObjects) {
 			ctx.drawImage(this.bgObjects[i].image,this.bgObjects[i].x, this.bgObjects[i].y);
 		}
-		for (var i in this) { 
-			if (this[i].draw)
-				this[i].draw(this.canvas); 
+		for (var i in this.collection) { 
+			if (this.collection[i].draw)
+				this.collection[i].draw(this.canvas); 
 		}
 	}
 }
 BookCollection.prototype.removeByName = function(name) {
 	var remove;
-	for (var i in this) {
-		if (this[i] && this[i].name === name) {
+	for (var i in this.collection) {
+		if (this.collection[i] && this.collection[i].name === name) {
 			remove = i;
 			break;
 		}
 	}
 	if (remove)
-		this.splice(remove, 1);
+		this.collection.splice(remove, 1);
 }
 
 window.onload = function() {
